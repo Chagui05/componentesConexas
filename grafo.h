@@ -9,6 +9,7 @@
 #include <queue>
 #include "Arco.h"
 
+
 using namespace std;
 
 class Grafo
@@ -54,6 +55,10 @@ public:
         return this->listaNodos.size();
     }
 
+    vector<NodoGrafo *>* getListaNodos()
+    {
+        return &this->listaNodos;
+    }
     void addNode(INodo *pNodo)
     {
         NodoGrafo *nuevoNodo = new NodoGrafo(pNodo);

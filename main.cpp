@@ -1,12 +1,9 @@
 #include <iostream>
 #include "grafo.h"
 #include "Lugar.h"
-#include "Persona.h"
-#include "WebApp.h"
-#include "NodoGrafo.h"
-#include "INodo.h"
+#include "GraphDiscover.h"
 #include <vector>
-
+#include <string>
 using namespace std;
 
 int main()
@@ -66,12 +63,24 @@ int main()
     grafo.addArc(&elSalvador,&guatemala, 7);
     grafo.addArc(&guatemala,&mexico, 8);
     grafo.addArc(&estadosUnidos,&mexico, 2);
+    grafo.addArc(&mexico,&estadosUnidos, 2);
 
 
-    vector<INodo *> result = grafo.broadPath(&estadosUnidos);
-    for (int i = 0; i < result.size(); i++)
-    {
-        Lugar dato = *((Lugar *)(void *)result[i]);
-        cout << dato.getId() << " " << dato.getNombre() << endl;
+    GraphDiscover gd = GraphDiscover();
+
+    NodoGrafo *nodo1 = grafo.getNodo(argentina.getId());
+    NodoGrafo *nodo2 = grafo.getNodo(estadosUnidos.getId());
+
+    Path * newPath = gd.getShorterPath(nodo1, nodo2, &grafo);
+
+
+    for(int k = 0; k < newPath->path.size(); k++){
+        cout <<newPath->path.at(k)->getInfo()->getNombre()  << endl;
     }
+    // vector<INodo *> result = grafo.broadPath(&estadosUnidos);
+    // for (int i = 0; i < result.size(); i++)
+    // {
+    //     Lugar dato = *((Lugar *)(void *)result[i]);
+    //     cout << dato.getId() << " " << dato.getNombre() << endl;
+    // }
 }
