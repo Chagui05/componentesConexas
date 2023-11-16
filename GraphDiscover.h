@@ -2,6 +2,8 @@
 #define _GRAPHDISCOVER_ 1
 
 #include <iostream>
+#include <vector>
+#include <map>
 #include "NodoGrafo.h"
 #include "grafo.h"
 
@@ -27,11 +29,57 @@ struct DistancePath
 class GraphDiscover
 {
 public:
-    vector<Path *> *getPathsByWarshall(NodoGrafo *pOrigen, NodoGrafo *pDestino, Grafo *pGrafo)
-    {
-        // el método usa el algoritmo de Warshall implementado con listas de adyacencia, el cual calcula todos los caminos posibles de todos los vertices en pGrafo
-        // retorna todos los Path posibles de pOrigen ha pDestino
-        // paths en Path es la lista de INodos que componen un posible camino y el peso es para ese respectivo camino
+    vector<Path *> *getPathsByWarshall(NodoGrafo *pOrigen, NodoGrafo *pDestino, Grafo *pGrafo) {
+        int numNodes = pGrafo->getSize();
+        vector<vector<bool>> adjacencyMatrix(numNodes, vector<bool>(numNodes, false));
+
+        for (auto node : *(pGrafo->getListaNodos())) {
+            for (auto arc : *(node->getArcs())) {
+                int originId = ((NodoGrafo *)arc->getOrigen())->getInfo()->getId();
+                int destId = ((NodoGrafo *)arc->getDestino())->getInfo()->getId();
+                adjacencyMatrix[originId][destId] = true;
+            }
+        }
+
+        for (int k = 0; k < numNodes; k++) {
+            for (int i = 0; i < numNodes; i++) {
+                for (int j = 0; j < numNodes; j++) {
+                    adjacencyMatrix[i][j] = adjacencyMatrix[i][j] || (adjacencyMatrix[i][k] && adjacencyMatrix[k][j]);
+                }
+            }
+        }
+        
+        vector<Path *> *resultPaths = new vector<Path *>();
+
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (adjacencyMatrix[i][j]) {
+                    Path *path = new Path();
+                    path->origen = pGrafo->getNodo(i);
+                    path->destino = pGrafo->getNodo(j);
+                    path->peso = 0;  // You might need to adjust this based on your requirements
+
+                    // Construct the path
+                    int currentNode = i;
+                    while (currentNode != j) {
+                        path->path.push_back(pGrafo->getNodo(currentNode));
+                        for (int nextNode = 0; nextNode < numNodes; nextNode++) {
+                            if (adjacencyMatrix[currentNode][nextNode] && adjacencyMatrix[nextNode][j]) {
+                                currentNode = nextNode;
+                                break;
+                            }
+                        }
+                    }
+                    path->path.push_back(pGrafo->getNodo(j));
+
+                    resultPaths->push_back(path);
+                }
+            }
+        }
+            return resultPaths;
+
+        
+       
     }
 
     Path *getShorterPath(NodoGrafo *pOrigen, NodoGrafo *pDestino, Grafo *pGrafo)
@@ -76,7 +124,9 @@ public:
     }
 
 private:
-DistancePath *getDistancePathNode(NodoGrafo *node, vector<DistancePath *> *nodes)
+    
+
+    DistancePath *getDistancePathNode(NodoGrafo *node, vector<DistancePath *> *nodes)
     {
         for (auto &distanceNode : *nodes)
         {

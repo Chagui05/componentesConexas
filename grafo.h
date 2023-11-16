@@ -108,7 +108,12 @@ public:
 
     NodoGrafo *getNodo(int pId)
     {
-        return hashNodos.at(pId);
+        if (hashNodos.find(pId) != hashNodos.end()) {
+             return hashNodos.at(pId);
+        } 
+        else {
+        return nullptr;
+        }
     }
 
     vector<INodo> deepPath(INodo *pOrigen)
